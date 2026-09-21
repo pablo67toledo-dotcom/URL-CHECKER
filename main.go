@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"net/http"
 )
-// Função para analisar a ULR recebida
+
+// Função para analisar a URL recebida
 func analisarURL(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Servidor recebeu uma URL")
+	url := r.URL.Query().Get("url")
+	fmt.Fprintln(w, "URL recebida:", url)
 }
+
 // Função principal do programa
-func main (){
+func main() {
 	http.HandleFunc("/analisar", analisarURL)
 
 	fmt.Println("Servidor rodando em http://localhost:8080")
