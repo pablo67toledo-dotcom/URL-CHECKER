@@ -12,12 +12,15 @@ func analisarURL(w http.ResponseWriter, r *http.Request) {
 
 	_, err := url.ParseRequestURI(urlRecebida)
 
+	urlParsed, err := url.Parse(urlRecebida)
+
 	if err != nil {
-		http.Error(w, "URL inválida", http.StatusBadRequest)
+		http.Error(w, "Não foi possível analisar a URL", http.StatusBadRequest)
 		return
 	}
+	dominio := urlParsed.Host
 
-	fmt.Fprintln(w, "URL válida:", urlRecebida)
+	fmt.Fprintln(w, "Domínio:", dominio)
 }
 
 // Função principal do programa
