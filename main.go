@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/pablo67toledo-dotcom/URL_CHECKER/domain"
 )
 
 // Função para analisar a URL recebida
@@ -20,7 +22,9 @@ func analisarURL(w http.ResponseWriter, r *http.Request) {
 	}
 	dominio := urlParsed.Host
 
-	fmt.Fprintln(w, "Domínio:", dominio)
+	resultado := domain.Check(dominio)
+
+	fmt.Fprintln(w, resultado)
 }
 
 // Função principal do programa
