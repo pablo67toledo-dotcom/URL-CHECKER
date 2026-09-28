@@ -14,15 +14,12 @@ func analisarURL(w http.ResponseWriter, r *http.Request) {
 
 	_, err := url.ParseRequestURI(urlRecebida)
 
-	urlParsed, err := url.Parse(urlRecebida)
+	dominio, err := domain.ExtractDomain(urlRecebida)
 
 	if err != nil {
-		http.Error(w, "Não foi possível analisar a URL", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusAccepted)
 		return
 	}
-	dominio := urlParsed.Host
-
-	err = domain.Validate(dominio)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
