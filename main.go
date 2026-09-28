@@ -22,6 +22,13 @@ func analisarURL(w http.ResponseWriter, r *http.Request) {
 	}
 	dominio := urlParsed.Host
 
+	err = domain.Validate(dominio)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	resultado := domain.Check(dominio)
 
 	fmt.Fprintln(w, resultado)
