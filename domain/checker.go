@@ -1,8 +1,16 @@
 package domain
 
-import "fmt"
+import (
+	"net"
+)
 
 // Check realiza a análise de um domínio.
-func Check(domainName string) string {
-	return fmt.Sprintf("Consultando o domínio: %s", domainName)
+func Check(domainName string) error {
+	_, err := net.LookupHost(domainName)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

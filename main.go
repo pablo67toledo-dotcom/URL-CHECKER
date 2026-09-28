@@ -26,9 +26,15 @@ func analisarURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resultado := domain.Check(dominio)
+	err = domain.Check(dominio)
 
-	fmt.Fprintln(w, resultado)
+	if err != nil {
+		http.Error(w, "Não foi possível encontrar o domínio", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Fprintln(w, "Domínio encontrado:", dominio)
+
 }
 
 // Função principal do programa
