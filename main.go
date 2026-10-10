@@ -14,7 +14,17 @@ func analisarURL(w http.ResponseWriter, r *http.Request) {
 
 	_, err := url.ParseRequestURI(urlRecebida)
 
+	if err != nil {
+		http.Error(w, "URL inválida", http.StatusBadRequest)
+		return
+	}
+
 	dominio, err := domain.ExtractDomain(urlRecebida)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusAccepted)
@@ -29,8 +39,19 @@ func analisarURL(w http.ResponseWriter, r *http.Request) {
 	err = domain.Check(dominio)
 
 	if err != nil {
-		http.Error(w, "Não foi possível encontrar o domínio", http.StatusBadRequest)
+		http.Error(w, "Domínio inválido", http.StatusBadRequest)
 		return
+	}
+	redirectURL, err := domain.CheckRedirect(urlRecebida)
+	if err != nil {
+		http.Error(w, "Não foi possível verificar o redirecionamento", http.StatusBadRequest)
+		return
+	}
+
+	if redirectURL != "" {
+		fmt.Fprintln(w, "Redirecionou para:", redirectURL)
+	} else {
+		fmt.Fprintln(w, "Não houve redirecionamento.")
 	}
 
 	fmt.Fprintln(w, "Domínio encontrado:", dominio)
