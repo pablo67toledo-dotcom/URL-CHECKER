@@ -57,3 +57,15 @@ func GetDomainCreationDate(domainName string) (time.Time, error) {
 
 	return time.Time{}, errors.New("data de criação do domínio não encontrada")
 }
+
+func CalculateDomainAge(creationDate time.Time) int {
+	today := time.Now()
+
+	age := today.Year() - creationDate.Year()
+
+	if today.YearDay() < creationDate.YearDay() {
+		age--
+	}
+
+	return age
+}
