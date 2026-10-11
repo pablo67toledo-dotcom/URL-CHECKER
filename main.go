@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
+	"time"
 
+	"github.com/joho/godotenv"
+	"github.com/pablo67toledo-dotcom/URL_CHECKER/database"
 	"github.com/pablo67toledo-dotcom/URL_CHECKER/domain"
 )
 
@@ -60,6 +65,29 @@ func analisarURL(w http.ResponseWriter, r *http.Request) {
 
 // Função principal do programa
 func main() {
+	// Carrega as variáveis do arquivo .env.
+	if err := godotenv.Load(); err != nil {
+		fmt.Println("Arquivo .env não carregado; usando variáveis do ambiente")
+	}
+
+	// Define um limite de tempo para iniciar a conexão.
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		10*time.Second,
+	)
+	defer cancel()
+
+	// Conecta ao PostgreSQL.
+	pool, err := database.NewPool(ctx)
+	if err != nil {
+		fmt.Println("Erro ao conectar ao PostgreSQL:", err)
+		os.Exit(1)
+	}
+	defer pool.Close()
+
+	fmt.Println("Conexão com PostgreSQL estabelecida.")
+
+	// Mantém a rota de análise que já existia.
 	http.HandleFunc("/analisar", analisarURL)
 
 	fmt.Println("Servidor rodando em http://localhost:8080")
