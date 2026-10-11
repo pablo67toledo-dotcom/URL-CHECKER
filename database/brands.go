@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -90,12 +91,53 @@ func GetBrandBySlug(
 	)
 
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			return Brand{}, fmt.Errorf("marca não encontrada: %s", slug)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return Brand{}, fmt.Errorf("marca não encontrada: %s: %w", slug, pgx.ErrNoRows)
 		}
 
 		return Brand{}, fmt.Errorf("não foi possível consultar a marca: %w", err)
 	}
 
 	return brand, nil
+}
+
+// ListBrands retorna todas as marcas ordenadas pelo ID.
+func ListBrands(
+	ctx context.Context,
+	pool *pgxpool.Pool,
+) ([]Brand, error) {
+	rows, err := pool.Query(
+		ctx,
+		`SELECT id, name, slug, created_at, updated_at
+		 FROM brands
+		 ORDER BY id`,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("não foi possível listar as marcas: %w", err)
+	}
+	defer rows.Close()
+
+	brands := make([]Brand, 0)
+
+	for rows.Next() {
+		var brand Brand
+
+		if err := rows.Scan(
+			&brand.ID,
+			&brand.Name,
+			&brand.Slug,
+			&brand.CreatedAt,
+			&brand.UpdatedAt,
+		); err != nil {
+			return nil, fmt.Errorf("não foi possível ler uma marca: %w", err)
+		}
+
+		brands = append(brands, brand)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("erro durante a listagem das marcas: %w", err)
+	}
+
+	return brands, nil
 }
