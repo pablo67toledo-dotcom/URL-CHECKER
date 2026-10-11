@@ -13,7 +13,7 @@ import (
 	"github.com/pablo67toledo-dotcom/URL_CHECKER/domain"
 )
 
-// Função para analisar a URL recebida
+// analisarURL analisa a URL recebida e verifica seu domínio.
 func analisarURL(w http.ResponseWriter, r *http.Request) {
 	urlRecebida := r.URL.Query().Get("url")
 
@@ -49,21 +49,21 @@ func analisarURL(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintln(w, "Domínio encontrado:", dominio)
 
-	// Consulta a data de criação do domínio
+	// Consulta a data de criação do domínio.
 	dataCriacao, err := domain.GetDomainCreationDate(dominio)
 	if err != nil {
 		fmt.Fprintln(w, "Não foi possível consultar a idade do domínio:", err)
 		return
 	}
 
-	// Calcula a idade em anos completos
+	// Calcula a idade do domínio em anos completos.
 	idade := domain.CalculateDomainAge(dataCriacao)
 
 	fmt.Fprintln(w, "Data de criação:", dataCriacao.Format("02/01/2006"))
 	fmt.Fprintf(w, "Idade do domínio: %d anos\n", idade)
 }
 
-// Função principal do programa
+// main inicializa o banco de dados e registra as rotas HTTP.
 func main() {
 	// Carrega as variáveis do arquivo .env.
 	if err := godotenv.Load(); err != nil {
@@ -87,8 +87,9 @@ func main() {
 
 	fmt.Println("Conexão com PostgreSQL estabelecida.")
 
-	// Mantém a rota de análise que já existia.
+	// Registra as rotas uma única vez, durante a inicialização.
 	http.HandleFunc("/analisar", analisarURL)
+	http.HandleFunc("/brands", brandHandler(pool))
 
 	fmt.Println("Servidor rodando em http://localhost:8080")
 
