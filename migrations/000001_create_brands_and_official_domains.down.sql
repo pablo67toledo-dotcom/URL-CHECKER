@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS official_domains;
+DROP TABLE IF EXISTS brands;
