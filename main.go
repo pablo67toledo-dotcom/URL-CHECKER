@@ -91,6 +91,11 @@ func main() {
 	http.HandleFunc("/analisar", analisarURL)
 	http.HandleFunc("/brands", brandHandler(pool))
 
+	officialDomainsHandler := &OfficialDomainsHandler{
+		Pool: pool,
+	}
+	http.Handle("/brands/", officialDomainsHandler)
+
 	fmt.Println("Servidor rodando em http://localhost:8080")
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
